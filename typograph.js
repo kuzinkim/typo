@@ -25,6 +25,9 @@ function applyTypography(text) {
         });
     });
 
+    // Заменяем дефисы между словами
+    text = text.replace(/(\S+)-(\S+)/g, '$1-&#8288;$2'); // Заменяем дефисы на неразрывный пробел
+
     console.log('После применения типографа:', text);
     return text;
 }
@@ -54,5 +57,6 @@ function applyTypographyToText() {
 
     // Записываем обратно результат без лишнего кодирования
     document.getElementById('outputText').value = tempDiv.innerHTML
-        .replace(/&amp;nbsp;/g, '&nbsp;'); // Убираем ошибочное кодирование
+        .replace(/&amp;nbsp;/g, '&nbsp;') // Убираем ошибочное кодирование
+        .replace(/&amp;#8288;/g, '&#8288;'); 
 }
