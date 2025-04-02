@@ -2,6 +2,15 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("applyTypographyBtn").addEventListener("click", applyTypographyToText);
 });
 
+// Массив предлогов и союзов, после которых нужен неразрывный пробел
+const wordsToFix = [
+    'и', 'да', 'или', 'либо', 'но', 'даже', 'хотя', 'если',
+    'как', 'когда', 'пока', 'в', 'на', 'под', 'с', 'о', 'об', 'для', 'за', 'без', 'из',
+    'по', 'про', 'через', 'при', 'между', 'над', 'обо', 'к', 'о'
+];
+
+const regexList = wordsToFix.map(word => new RegExp(`(?<=\\s|^)${word}\\s(?=\\S)`, 'g'));
+
 function applyTypography(text) {
     if (!text) {
         console.log("Ошибка: текст пустой!");
@@ -10,18 +19,11 @@ function applyTypography(text) {
 
     console.log("Получен текст для обработки:", text);
 
-    // Массив предлогов и союзов, после которых нужен неразрывный пробел
-    const wordsToFix = [
-        'и', 'да', 'или', 'либо', 'но', 'даже', 'хотя', 'если',
-        'как', 'когда', 'пока', 'в', 'на', 'под', 'с', 'о', 'об', 'для', 'за', 'без', 'из',
-        'по', 'про', 'через', 'при', 'между', 'над', 'обо', 'к', 'о'
-    ];
-
-    wordsToFix.forEach(word => {
-        const regex = new RegExp(`(?<=\\s|^)${word}\\s(?=\\S)`, 'g');
+    // Обрабатываем предлоги (добавляем неразрывный пробел &nbsp;)
+    regexList.forEach((regex, index) => {
         text = text.replace(regex, (match) => {
-            console.log(`Найдено: "${match.trim()}", заменяем на: "${word}&nbsp;"`);
-            return word + '&nbsp;';
+            console.log(`Найдено: "${match.trim()}", заменяем на: "${wordsToFix[index]}&nbsp;"`);
+            return wordsToFix[index] + '&nbsp;'; // Используем неразрывный пробел
         });
     });
 
@@ -37,9 +39,9 @@ function applyTypographyToText() {
 
     console.log("Полученный текст из поля ввода:", inputText);
 
-    // Создаем временный элемент для работы с HTML
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = inputText;
+    // Создаем DOMParser для обработки HTML
+    const parser = new DOMParser();
+    const tempDiv = parser.parseFromString(inputText, 'text/html').body;
 
     // Функция для обхода текстовых узлов
     function walkTextNodes(node) {
@@ -58,5 +60,5 @@ function applyTypographyToText() {
     // Записываем обратно результат без лишнего кодирования
     document.getElementById('outputText').value = tempDiv.innerHTML
         .replace(/&amp;nbsp;/g, '&nbsp;') // Убираем ошибочное кодирование
-        .replace(/&amp;#8288;/g, '&#8288;'); 
+        .replace(/&amp;#8288;/g, '&#8288;');
 }
